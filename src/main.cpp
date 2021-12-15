@@ -49,6 +49,7 @@ void setup() {
   WiFi.begin(WIFI_NAME, WIFI_PASS);
   Heltec.display->drawString(0,0, "WiFi connecting...");
   Heltec.display->display();
+  Serial.println("WiFi connecting...");
 
   while (WiFi.status() != WL_CONNECTED) {
     delay(100); // 100ms warten...
