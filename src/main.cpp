@@ -1,9 +1,81 @@
+
 #include <Arduino.h>
+#include <heltec.h>
+#include <WiFi.h>
+#include <MQTT.h>
+#include <OneButton.h>
+
+WiFiClient net;
+MQTTClient client;
+
+unsigned long lastMillis = 0;
+
+OneButton button(0);
+
+void connect() {
+  // Serial.print("checking wifi...");
+  while (WiFi.status() != WL_CONNECTED) {
+    // Serial.print(".");
+    delay(100);
+  }
+
+  // Serial.print("\nconnecting...");
+  while (!client.connect("arduino", "public", "public")) {
+    // Serial.print(".");
+    delay(1000);
+  }
+
+  // Serial.println("\nconnected!");
+
+  client.subscribe("/BWIWS21KS/Malte/Button");
+  client.subscribe("/BWIWS21KS/Claudius/button");
+}
+
+void messageReceived(String &topic, String &payload) {
+  Serial.println("incoming: " + topic + " - " + payload);
+  digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
+}
+
+void doClick() {
+    Serial.println("publish");
+    client.publish("/BWIWS21KS/Claudius/button", "click");
+}
 
 void setup() {
-  // put your setup code here, to run once:
+  Heltec.begin(true, false, true);
+  Heltec.display->clear();
+
+  // Hier die WLAN-Zugangsdaten eingeben...
+  WiFi.begin("TP-LINK_58C8", "Test_123");
+  Heltec.display->drawString(0,0, "WiFi connecting...");
+  Heltec.display->display();
+
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(100); // 100ms warten...
+  }  
+  Heltec.display->clear();
+
+  Heltec.display->drawString(0,0, "WiFi connected");
+  Heltec.display->drawString(0,12, "IP: " + WiFi.localIP().toString());
+  Heltec.display->display();
+
+  button.attachClick(doClick);
+
+  // Es gibt einen Browser-basierten Client unter
+  // http://www.hivemq.com/demos/websocket-client/
+  // Um die Meldungen zu sehen muss das gleiche "Topic" subscribed werden (Hier "/hello")
+  client.begin("broker.hivemq.com", 1883, net);
+  client.onMessage(messageReceived);
+
+  connect();
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
+  client.loop();
+  button.tick();
+  delay(10);  // <- fixes some issues with WiFi stability
+
+  if (!client.connected()) {
+    connect();
+  }
 }
