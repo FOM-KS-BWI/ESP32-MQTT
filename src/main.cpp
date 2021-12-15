@@ -21,14 +21,13 @@ void connect() {
   }
 
   // Serial.print("\nconnecting...");
-  while (!client.connect("arduino", "public", "public")) {
+  while (!client.connect(CLIENT_ID, "public", "public")) {
     // Serial.print(".");
     delay(1000);
   }
 
   // Serial.println("\nconnected!");
 
-  client.subscribe("/BWIWS21KS/Malte/Button");
   client.subscribe("/BWIWS21KS/Claudius/button");
 }
 
