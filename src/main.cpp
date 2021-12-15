@@ -4,6 +4,7 @@
 #include <WiFi.h>
 #include <MQTT.h>
 #include <OneButton.h>
+#include "credentials.h"
 
 WiFiClient net;
 MQTTClient client;
@@ -46,7 +47,7 @@ void setup() {
   Heltec.display->clear();
 
   // Hier die WLAN-Zugangsdaten eingeben...
-  WiFi.begin("TP-LINK_58C8", "Test_123");
+  WiFi.begin(WIFI_NAME, WIFI_PASS);
   Heltec.display->drawString(0,0, "WiFi connecting...");
   Heltec.display->display();
 
