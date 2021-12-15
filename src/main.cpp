@@ -55,10 +55,12 @@ void setup() {
     delay(100); // 100ms warten...
   }  
   Heltec.display->clear();
+  Serial.println("WiFi connected.");
 
   Heltec.display->drawString(0,0, "WiFi connected");
   Heltec.display->drawString(0,12, "IP: " + WiFi.localIP().toString());
   Heltec.display->display();
+  Serial.println("IP: " + WiFi.localIP().toString());
 
   button.attachClick(doClick);
 
